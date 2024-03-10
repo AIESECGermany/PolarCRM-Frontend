@@ -1,19 +1,19 @@
-import { Component } from '@angular/core';
-import { MemberService } from '../member.service';
-import { MemberData } from '../interfaces';
+import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MemberData } from '../interfaces';
+import { MemberService } from '../member.service';
 
 @Component({
   selector: 'app-performance-management',
   templateUrl: './performance-management.component.html',
   styleUrls: ['./performance-management.component.scss']
 })
-export class PerformanceManagementComponent {
+export class PerformanceManagementComponent implements OnInit {
 
-  public includeArchived: boolean = false;
+  public includeArchived = false;
   public members: MemberData[];
-  public selectedMemberId: number = 3;
-  public ready: boolean = false;
+  public selectedMemberId = 3;
+  public ready = false;
 
   constructor(
     private memberService: MemberService,
@@ -28,9 +28,9 @@ export class PerformanceManagementComponent {
       });
     } catch (err) {
       if(err instanceof Error) {
-        this.snackbar.open(err.message, "", { duration: 5000 });
+        this.snackbar.open(err.message, '', { duration: 5000 });
       } else {
-        this.snackbar.open("Members could not be fetched", "", { duration: 5000 });
+        this.snackbar.open('Members could not be fetched', '', { duration: 5000 });
       }
     }
   }

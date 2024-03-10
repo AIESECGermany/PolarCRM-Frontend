@@ -1,14 +1,15 @@
+import { SocialUser } from '@abacritt/angularx-social-login';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserCredentials, UserRole } from './interfaces';
-import { SocialUser } from '@abacritt/angularx-social-login';
+import { environment } from 'src/environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  public domain = "http://localhost:8000/login/";
+  public domain = environment.serverUrl + '/login/';
   public user: UserCredentials = {
     token: '',
     role: 'none',
@@ -20,18 +21,17 @@ export class AuthService {
   public authenticateUser(user: SocialUser): Promise<UserCredentials> {
     return new Promise((resolve) => {
       this.user.token = user.idToken;
-      try {
-        const req = this.http.post<any>(
-          this.domain,
-          { "token": this.user.token },
-          { headers: {'Content-Type': 'application/json'} }
-        );
-        req.subscribe((res) => {
-          this.user.role = res.userRole;
-          this.user.lc = res.lc;
-          resolve(this.user);
-        });
-      } catch(error) { throw error; }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const req = this.http.post<any>(
+        this.domain,
+        { 'token': this.user.token },
+        { headers: {'Content-Type': 'application/json'} }
+      );
+      req.subscribe((res) => {
+        this.user.role = res.userRole;
+        this.user.lc = res.lc;
+        resolve(this.user);
+      });
     });
   }
 

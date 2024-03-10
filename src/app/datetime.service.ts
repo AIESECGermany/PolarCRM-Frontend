@@ -8,13 +8,13 @@ export class DatetimeService {
 
   constructor() { }
 
-  transformDate(date: any): string {
-    let transformedDate = DateTime.fromISO(date);
+  transformDate(date: string): string {
+    const transformedDate = DateTime.fromISO(date);
     return transformedDate.toLocal().toLocaleString(DateTime.DATE_MED);
   }
 
-  transformDateAndTime(date: any): string {
-    let transformedDate = DateTime.fromISO(date);
+  transformDateAndTime(date: string): string {
+    const transformedDate = DateTime.fromISO(date);
     return transformedDate.toLocal().toLocaleString(DateTime.DATETIME_MED);
   }
 }

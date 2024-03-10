@@ -12,7 +12,7 @@
                     [routerLink]="[{outlets: {'member': [member._id]}}]"
                     [routerLinkActive]="['activeMember']"
                 >
-                    {{member.firstName}} {{member.familyName[0]}}.
+                    {{member.firstName}} {{member.familyName[0] | titlecase }}.
                 </mat-list-item>
                 <mat-divider></mat-divider>
             </ng-container>

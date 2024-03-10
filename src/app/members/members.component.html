@@ -21,11 +21,11 @@
         </ng-container>
         <ng-container matColumnDef="firstName">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> First Name </th>
-            <td mat-cell *matCellDef="let row"> {{row.firstName}} </td>
+            <td mat-cell *matCellDef="let row"> {{row.firstName | titlecase }} </td>
         </ng-container>
         <ng-container matColumnDef="familyName">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Family Name </th>
-            <td mat-cell *matCellDef="let row"> {{row.familyName}} </td>
+            <td mat-cell *matCellDef="let row"> {{row.familyName | titlecase }} </td>
         </ng-container>
         <ng-container matColumnDef="stage">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Stage </th>

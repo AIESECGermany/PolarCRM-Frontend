@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatChipSelectionChange } from '@angular/material/chips';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { RecruiterDetailComponent } from '../recruiter-detail/recruiter-detail.component';
-import { ApplicantData, ApplicantStageType, ApplicantStageTypeDisplay, LcType, LcTypeDisplay } from '../interfaces';
 import { ApplicantService } from '../applicant.service';
-import { MatChipSelectionChange } from '@angular/material/chips';
 import { DatetimeService } from '../datetime.service';
 import { DisplayService } from '../display.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ApplicantData, ApplicantStageType, ApplicantStageTypeDisplay, LcType, LcTypeDisplay } from '../interfaces';
+import { RecruiterDetailComponent } from '../recruiter-detail/recruiter-detail.component';
 
 @Component({
   selector: 'app-recruitment',
@@ -21,9 +21,9 @@ export class RecruitmentComponent implements OnInit {
   displayedColumns: string[] = ['_id', 'firstName', 'familyName', 'lc', 'stage', 'createdAt'];
   dataSource: MatTableDataSource<ApplicantData> = new MatTableDataSource<ApplicantData>();
   applicants: ApplicantData[] = [];
-  openCounter: number = 0;
-  filteredApplicants: number = 0;
-  includeArchived: boolean = false;
+  openCounter = 0;
+  filteredApplicants = 0;
+  includeArchived = false;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -53,9 +53,9 @@ export class RecruitmentComponent implements OnInit {
       });
     } catch (err) {
       if(err instanceof Error) {
-        this.snackbar.open(err.message, "", { duration: 5000 });
+        this.snackbar.open(err.message, '', { duration: 5000 });
       } else {
-        this.snackbar.open("Applicants could not be fetched", "", { duration: 5000 });
+        this.snackbar.open('Applicants could not be fetched', '', { duration: 5000 });
       }
     }
   }

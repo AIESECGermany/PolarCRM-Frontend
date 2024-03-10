@@ -15,7 +15,7 @@
                 </span>
             </a>
         </li>
-        <li class="sidenav-nav-item" (click)="logout()">
+        <li class="sidenav-nav-item" (click)="logout()" (keydown)="logout()" tabindex="0">
             <a class="sidenav-nav-link">
                 <i class="sidenav-link-icon" [class]="'fal fa-sign-out-alt'"></i>
                 <span class="sidenav-link-text" @fadeInOut *ngIf="extended">

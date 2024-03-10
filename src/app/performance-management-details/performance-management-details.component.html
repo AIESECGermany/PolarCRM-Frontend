@@ -10,26 +10,31 @@
                     <h3>Member Information</h3>
                     <mat-form-field class="docs-input" appearance="outline">
                       <mat-label>Expa ID</mat-label>
-                      <input matInput>
+                      <input matInput required [(ngModel)]="newExpaId">
                     </mat-form-field>
                     <mat-form-field class="docs-input" appearance="outline">
                       <mat-label>AIESEC Email</mat-label>
-                      <input matInput>
+                      <input matInput required [(ngModel)]="newAiesecEmail">
                     </mat-form-field>
-                    <button class="mat-elevation-z4 save-button">
+                    <button class="mat-elevation-z4 save-button" (click)="saveData()">
                       <fa-icon class="fa-solid fa-save"></fa-icon>
                       Save Changes
                     </button>
                   </div>
                   <div class="docs-section">
                     <h3>Data Security Documents</h3>
-                    <button class="mat-elevation-z4 docs-button">
+                    <button class="mat-elevation-z4 docs-button"
+                      [disabled]="!memberDetails.aiesecEmail && !memberDetails.expaId"
+                    >
                       <fa-icon class="fa-solid fa-download"></fa-icon>
                       Download
                     </button>
-                    <button class="mat-elevation-z4 docs-button">
-                      <fa-icon class="fa-solid fa-upload"></fa-icon>
-                      Upload
+                    <button class="mat-elevation-z4 docs-button" (click)="fileUpload.click()"
+                      [disabled]="!memberDetails.aiesecEmail && !memberDetails.expaId"
+                    >
+                        <input type="file" style="display: none" accept=".pdf" #fileUpload (change)="uploadDoc($event)">
+                        <fa-icon class="fa-solid fa-upload"></fa-icon>
+                        Upload
                     </button>
                   </div>
                 </div>

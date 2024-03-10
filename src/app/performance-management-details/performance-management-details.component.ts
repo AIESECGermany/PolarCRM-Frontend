@@ -1,28 +1,43 @@
-import { Component } from '@angular/core';
-import { Comment, Function, FunctionType, FunctionTypeDisplay, MemberDataDetail, MemberStage, MemberStageType, MemberStageTypeDisplay, Role, RoleType, RoleTypeDisplay } from '../interfaces';
-import { MemberService } from '../member.service';
+import { Component, OnInit } from '@angular/core';
 import { MatChipListboxChange } from '@angular/material/chips';
-import { DateTime } from 'luxon';
-import { DisplayService } from '../display.service';
-import { DatetimeService } from '../datetime.service';
-import { ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { ResponsiveDialogComponent } from '../responsive-dialog/responsive-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
+import { DateTime } from 'luxon';
+import { DatetimeService } from '../datetime.service';
+import { DisplayService } from '../display.service';
+import { DseService } from '../dse.service';
+import {
+  Comment,
+  FunctionType,
+  FunctionTypeDisplay,
+  IFunction,
+  MemberDataDetail,
+  MemberStage,
+  MemberStageType,
+  MemberStageTypeDisplay,
+  Role,
+  RoleType,
+  RoleTypeDisplay
+} from '../interfaces';
+import { MemberService } from '../member.service';
+import { ResponsiveDialogComponent } from '../responsive-dialog/responsive-dialog.component';
 
 @Component({
   selector: 'app-performance-management-details',
   templateUrl: './performance-management-details.component.html',
   styleUrls: ['./performance-management-details.component.scss']
 })
-export class PerformanceManagementDetailsComponent {
+export class PerformanceManagementDetailsComponent implements OnInit {
 
   public memberDetails: MemberDataDetail;
-  public ready: boolean = false;
-  public panelOpenState: boolean = false;
+  public ready = false;
+  public panelOpenState = false;
   public newRole: RoleType;
   public newFunction: FunctionType;
   public newJobDescription: string;
+  public newExpaId: number;
+  public newAiesecEmail: string;
   public currentMemberId: number;
   public currentMemberStage: MemberStageType;
   public currentMemberRole: RoleType;
@@ -44,7 +59,7 @@ export class PerformanceManagementDetailsComponent {
     {value: 'teamLeader', displayValue: 'Team Leader'},
     {value: 'vicePresident', displayValue: 'Vice President'}
   ];
-  public functions: Function[] = [
+  public functions: IFunction[] = [
     {value: 'finance', displayValue: 'Finance'},
     {value: 'marketing', displayValue: 'Marketing'},
     {value: 'outgoingGlobalVolunteer', displayValue: 'Outgoing Global Volunteer'},
@@ -60,7 +75,8 @@ export class PerformanceManagementDetailsComponent {
     private dateService: DatetimeService,
     private route: ActivatedRoute,
     private dialog: MatDialog,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private dseService: DseService
   ) { }
 
   ngOnInit(): void {
@@ -74,6 +90,8 @@ export class PerformanceManagementDetailsComponent {
     try {
       this.memberService.getMemberDetails(this.currentMemberId).subscribe(memberData => {
         this.memberDetails = memberData;
+        this.newExpaId = this.memberDetails.expaId;
+        this.newAiesecEmail = this.memberDetails.aiesecEmail;
         this.currentMemberStage = this.memberDetails.currentRole.stage;
         this.currentMemberRole = this.memberDetails.currentRole.role;
         this.currentMemberFunction = this.memberDetails.currentRole.function;
@@ -81,9 +99,24 @@ export class PerformanceManagementDetailsComponent {
       });
     } catch (err) {
       if(err instanceof Error) {
-        this.snackbar.open(err.message, "", { duration: 5000 });
+        this.snackbar.open(err.message, '', { duration: 5000 });
       } else {
-        this.snackbar.open("Member Details could not be fetched", "", { duration: 5000 });
+        this.snackbar.open('Member Details could not be fetched', '', { duration: 5000 });
+      }
+    }
+  }
+
+  public updateMemberData() {
+    try {
+      this.memberService.updateMember(this.memberDetails).subscribe(() => {
+        this.snackbar.open('Member has been updated successfully', '', { duration: 2000 });
+        this.fetchMemberDetails();
+      });
+    } catch (err) {
+      if(err instanceof Error) {
+        this.snackbar.open(err.message, '', { duration: 5000 });
+      } else {
+        this.snackbar.open('Member could not be updated!', '', { duration: 5000 });
       }
     }
   }
@@ -135,18 +168,7 @@ export class PerformanceManagementDetailsComponent {
         break;
     }
 
-    try {
-      this.memberService.updateMember(this.memberDetails).subscribe(() => {
-        this.snackbar.open('Member has been updated successfully', "", { duration: 2000 });
-        this.fetchMemberDetails();
-      });
-    } catch (err) {
-      if(err instanceof Error) {
-        this.snackbar.open(err.message, "", { duration: 5000 });
-      } else {
-        this.snackbar.open("Member could not be updated!", "", { duration: 5000 });
-      }
-    }
+    this.updateMemberData();
   }
 
   public updateRole(event: MatChipListboxChange) {
@@ -194,14 +216,14 @@ export class PerformanceManagementDetailsComponent {
 
     try {
       this.memberService.addNewRole(this.memberDetails).subscribe(() => {
-        this.snackbar.open('New role has been added successfully', "", { duration: 2000 });
+        this.snackbar.open('New role has been added successfully', '', { duration: 2000 });
         this.fetchMemberDetails();
       });
     } catch (err) {
       if(err instanceof Error) {
-        this.snackbar.open(err.message, "", { duration: 5000 });
+        this.snackbar.open(err.message, '', { duration: 5000 });
       } else {
-        this.snackbar.open("New role could not be saved!", "", { duration: 5000 });
+        this.snackbar.open('New role could not be saved!', '', { duration: 5000 });
       }
     }
   }
@@ -211,19 +233,66 @@ export class PerformanceManagementDetailsComponent {
     this.dialog.open(ResponsiveDialogComponent, dialogConfig);
   }
 
-  transformStageView(stage: MemberStageType): MemberStageTypeDisplay | string {
+  public saveData() {
+    if(
+      this.newExpaId === this.memberDetails.expaId &&
+      this.newAiesecEmail === this.memberDetails.aiesecEmail
+    ) { return; }
+    this.memberDetails.expaId = this.newExpaId;
+    this.memberDetails.aiesecEmail = this.newAiesecEmail;
+    try {
+      this.memberService.addMemberInfo(this.memberDetails).subscribe(() => {
+        this.snackbar.open('Member has been updated successfully', '', { duration: 2000 });
+        this.fetchMemberDetails();
+      });
+    } catch (err) {
+      if(err instanceof Error) {
+        this.snackbar.open(err.message, '', { duration: 5000 });
+      } else {
+        this.snackbar.open('Member could not be updated!', '', { duration: 5000 });
+      }
+    }
+  }
+
+  public uploadDoc(event: Event) {
+    if(!event) { return; }
+    const e = (event.target) as HTMLInputElement;
+    if(!e.files) { return; }
+    const file: File = e.files[0];
+    if(!file) { return; }
+    try {
+        this.dseService.uploadDocument(file)
+        .subscribe(() => {
+          try {
+            this.memberService.verifyMembership(this.memberDetails).subscribe(() => {
+              this.snackbar.open('Document Upload successful', '', { duration: 2000 });
+            });
+          } catch (err) {
+            if(err instanceof Error) {
+              this.snackbar.open(err.message, '', { duration: 5000 });
+            }
+          }
+        });
+    } catch(err) {
+        if(err instanceof Error) {
+            this.snackbar.open(err.message, '', { duration: 5000 });
+        }
+    }
+  }
+
+  public transformStageView(stage: MemberStageType): MemberStageTypeDisplay | string {
     return this.displayService.getMemberStageDisplayValue(stage);
   }
 
-  transformRoleView(role: RoleType): RoleTypeDisplay | string {
+  public transformRoleView(role: RoleType): RoleTypeDisplay | string {
     return this.displayService.getMemberRoleDisplayValue(role);
   }
 
-  transformFunctionView(functionName: FunctionType): FunctionTypeDisplay | string {
+  public transformFunctionView(functionName: FunctionType): FunctionTypeDisplay | string {
     return this.displayService.getMemberFunctionDisplayValue(functionName);
   }
 
-  transformDate(date: any): string {
-    return this.dateService.transformDate(date);
+  public transformDate(date: unknown): string {
+    return this.dateService.transformDate(date as string);
   }
 }

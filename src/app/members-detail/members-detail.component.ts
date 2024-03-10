@@ -1,11 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MemberDataDetail, Comment, MemberStageType, MemberStageTypeDisplay, RoleType, RoleTypeDisplay, FunctionType, FunctionTypeDisplay } from '../interfaces';
-import { MemberService } from '../member.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { DatetimeService } from '../datetime.service';
 import { DisplayService } from '../display.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Comment, FunctionType, FunctionTypeDisplay, MemberDataDetail, MemberStageType, MemberStageTypeDisplay, RoleType, RoleTypeDisplay } from '../interfaces';
+import { MemberService } from '../member.service';
 
 @Component({
   selector: 'app-members-detail',
@@ -13,7 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./members-detail.component.scss']
 })
 export class MembersDetailComponent implements OnInit {
-  ready: boolean = false;
+  ready = false;
   form: FormGroup;
   comments: string[];
   newComment: string;
@@ -35,7 +35,7 @@ export class MembersDetailComponent implements OnInit {
     });
     
     this.comments = [];
-    this.newComment = "";
+    this.newComment = '';
     this.fetchMemberDetails();
   }
 
@@ -49,7 +49,7 @@ export class MembersDetailComponent implements OnInit {
       if(err instanceof Error) {
         this.snackbar.open(err.message);
       } else {
-        this.snackbar.open("Member Details could not be fetched");
+        this.snackbar.open('Member Details could not be fetched');
       }
     }
   }
@@ -64,7 +64,7 @@ export class MembersDetailComponent implements OnInit {
   }
 
   addComment() {
-    if (this.newComment != "") {
+    if (this.newComment != '') {
       const newComment: Comment = {
         changedAt: new Date(),
         entry: this.newComment,
@@ -75,16 +75,16 @@ export class MembersDetailComponent implements OnInit {
       .subscribe(updatedMember => {
         this.memberDetails.comments = updatedMember.comments;
       });
-      this.newComment = "";
+      this.newComment = '';
     }
   }
 
-  transformDateAndTime(date: any): string {
-    return this.datetimeService.transformDateAndTime(date);
+  transformDateAndTime(date: unknown): string {
+    return this.datetimeService.transformDateAndTime(date as string);
   }
 
-  transformDate(date: any): string{
-    return this.datetimeService.transformDate(date);
+  transformDate(date: unknown): string{
+    return this.datetimeService.transformDate(date as string);
   }
 
   transformStageView(stage: MemberStageType): MemberStageTypeDisplay | string {
