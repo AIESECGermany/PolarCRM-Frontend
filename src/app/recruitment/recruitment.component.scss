@@ -9,7 +9,11 @@ mat-card {
 .filter {
   display: flex;
   align-items: center;
-  margin: 10px;
+  position: sticky;
+  top: 0;
+  padding: 10px;
+  background-color: inherit;
+  width: 100%;
   mat-form-field {
     width: 75%;
     flex-shrink: 1;
@@ -28,6 +32,8 @@ table {
   
 th {
   width: 20%;
+  position: sticky;
+  top: 5rem;
 }
 
 .main {
